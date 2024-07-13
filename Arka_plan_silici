@@ -1,0 +1,49 @@
+
+# pip install rembg remove modülünü yükler.
+#pip install Pillow Image modülünü yükler.
+#pip install numpy modülünü yükler
+
+import os
+from rembg import remove
+from PIL import Image
+import numpy as np
+
+# Kaynak ve hedef dizinlerini belirleyin
+input_directory = r'input' #Tırnak işaretinin arasına dosya yolunu yazınız.
+output_directory = r'Output'
+
+# Kaynak dizinindeki tüm dosyaları alın
+file_list = os.listdir(input_directory)
+
+# Her bir dosya için işlem yapın
+for filename in file_list:
+    # Dosyanın tam yolu
+    input_path = os.path.join(input_directory, filename)
+
+    # Sadece JPEG dosyalarını işle
+    if filename.lower().endswith('.jpg') or filename.lower().endswith('.jpeg'):
+        try:
+            # Resmi aç ve numpy dizisine dönüştür
+            input_image = Image.open(input_path)
+            input_array = np.array(input_image)
+
+            # Arka planı kaldır
+            output_array = remove(input_array)
+
+            # Numpy dizisini PIL Image'e dönüştür ve PNG olarak kaydet
+            output_image = Image.fromarray(output_array)
+
+            # Çıktı dosyasının yolunu oluştur (PNG olarak kaydet)
+            output_path = os.path.join(output_directory, os.path.splitext(filename)[0] + '.png')
+
+            # Resmi PNG olarak kaydet
+            output_image.save(output_path, format='PNG')
+
+            print(
+                f"{filename} dosyasından arka plan başarıyla kaldırıldı ve {output_path} konumuna PNG formatında kaydedildi.")
+
+        except Exception as e:
+            print(f"{filename} dosyası işlenirken bir hata oluştu: {str(e)}")
+
+    else:
+        print(f"{filename} JPEG dosyası değil, işlenmedi.")
